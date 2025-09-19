@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 contract EmployeeStorage {
 
-    uint32 private idNumber;
+    uint64 private idNumber;
     uint128 private shares;
     uint private salary;
     string private name;
@@ -11,7 +11,7 @@ contract EmployeeStorage {
     error NotAuthorized();
 
     constructor(
-        uint32 _idNumber,
+        uint64 _idNumber,
         uint128 _shares,
         uint _salary,
         string memory _name
@@ -23,7 +23,7 @@ contract EmployeeStorage {
     }
 
     function getEmployeeData() public view returns (
-        uint32,
+        uint64,
         uint128,
         uint,
         string memory

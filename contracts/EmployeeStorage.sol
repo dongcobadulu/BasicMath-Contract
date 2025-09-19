@@ -5,8 +5,8 @@ contract EmployeeStorage {
 
     uint128 private shares;
     uint private salary;
-    string public name;
     uint public idNumber;
+    string public name;
 
     error TooManyShares(uint newShares);
 

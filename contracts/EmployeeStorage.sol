@@ -10,7 +10,7 @@ contract EmployeeStorage {
 
     error TooManyShares(uint newShares);
 
-    constructor(uint _shares, string memory _name, uint _salary, uint _idNumber) {
+    constructor(uint128 _shares, string memory _name, uint _salary, uint _idNumber) {
         shares = _shares;
         name = _name;
         salary = _salary;
@@ -25,7 +25,7 @@ contract EmployeeStorage {
         return shares;
     }
 
-    function grantShares(uint _newShares) public {
+    function grantShares(uint128 _newShares) public {
         if (_newShares > 5000) {
             revert("Too many shares");
         }

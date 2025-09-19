@@ -3,9 +3,7 @@ pragma solidity ^0.8.20;
 
 contract EmployeeStorage {
 
-    // Optimalisasi penyimpanan dengan mengurutkan dari tipe data yang lebih kecil
-    // Meskipun uint dan string tidak bisa di-pack, mengurutkannya
-    // dari yang terkecil tetap merupakan praktik terbaik.
+    // Susunan variabel yang dioptimalkan untuk packing.
     uint128 private shares;
     uint private salary;
     uint public idNumber;
@@ -20,7 +18,8 @@ contract EmployeeStorage {
         _;
     }
 
-    constructor(uint128 _shares, string memory _name, uint _salary, uint _idNumber) {
+    // Urutan parameter constructor sekarang cocok dengan urutan variabel di atas.
+    constructor(uint128 _shares, uint _salary, uint _idNumber, string memory _name) {
         shares = _shares;
         name = _name;
         salary = _salary;

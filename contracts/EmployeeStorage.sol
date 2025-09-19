@@ -1,57 +1,52 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "hardhat/console.sol";
+
+error TooManyShares(uint newShares);
+
 contract EmployeeStorage {
-
-    uint128 private shares;
-    uint private salary;
-    uint public idNumber;
+    uint16 private shares;
+    uint248 private salary;
     string public name;
-    address public owner;
+    uint public idNumber;
 
-    error TooManyShares(uint newShares);
-    error ExceedsMaxNewShares(uint requested);
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not the owner");
-        _;
-    }
-
-    constructor(uint128 _shares, string memory _name, uint _salary, uint _idNumber) {
+    constructor(uint16 _shares, string memory _name, uint248 _salary, uint _idNumber) {
         shares = _shares;
         name = _name;
         salary = _salary;
         idNumber = _idNumber;
-        owner = msg.sender;
     }
 
-    function viewSalary() public view returns (uint) {
-        return salary;
-    }
-
-    function viewShares() public view returns (uint) {
+    function viewShares() public view returns (uint16) {
         return shares;
     }
 
-    function grantShares(uint128 _newShares) public onlyOwner {
-        if (_newShares > 5000) {
-            revert ExceedsMaxNewShares(_newShares);
-        }
-        
-        if (shares + _newShares > 5000) {
-            revert TooManyShares(shares + _newShares);
-        }
-
-        shares += _newShares;
+    function viewSalary() public view returns (uint248) {
+        return salary;
     }
 
-    function debugResetShares() public onlyOwner {
-        shares = 1000;
+    function grantShares(uint _newShares) public {
+        if (_newShares > 5000) {
+            revert("Too many shares");
+        }
+        
+        uint newTotalShares = uint(shares) + _newShares;
+
+        if (newTotalShares > 5000) {
+            revert TooManyShares(newTotalShares);
+        }
+
+        shares = uint16(newTotalShares);
     }
 
     function checkForPacking(uint _slot) public view returns (uint r) {
         assembly {
             r := sload (_slot)
         }
+    }
+
+    function debugResetShares() public {
+        shares = 1000;
     }
 }

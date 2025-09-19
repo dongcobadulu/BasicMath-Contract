@@ -3,7 +3,6 @@ pragma solidity ^0.8.20;
 
 contract EmployeeStorage {
 
-    // Susunan variabel yang dioptimalkan untuk packing.
     uint128 private shares;
     uint private salary;
     uint public idNumber;
@@ -18,7 +17,6 @@ contract EmployeeStorage {
         _;
     }
 
-    // Urutan parameter constructor sekarang cocok dengan urutan variabel di atas.
     constructor(uint128 _shares, uint _salary, uint _idNumber, string memory _name) {
         shares = _shares;
         name = _name;
@@ -47,13 +45,27 @@ contract EmployeeStorage {
         shares += _newShares;
     }
 
-    function debugResetShares() public onlyOwner {
-        shares = 1000;
-    }
-
+    /**
+    * Do not modify this function. It is used to enable the unit test for this pin
+    * to check whether or not you have configured your storage variables to make
+    * use of packing.
+    *
+    * If you wish to cheat, simply modify this function to always return `0`
+    * I'm not your boss ¯\_(ツ)_/¯
+    *
+    * Fair warning though, if you do cheat, it will be on the blockchain having been
+    * deployed by your wallet....FOREVER!
+    */
     function checkForPacking(uint _slot) public view returns (uint r) {
         assembly {
             r := sload (_slot)
         }
+    }
+
+    /**
+    * Warning: Anyone can use this function at any time!
+    */
+    function debugResetShares() public onlyOwner {
+        shares = 1000;
     }
 }

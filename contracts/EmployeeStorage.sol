@@ -7,14 +7,22 @@ contract EmployeeStorage {
     uint private salary;
     uint public idNumber;
     string public name;
+    address public owner;
 
     error TooManyShares(uint newShares);
+    error ExceedsMaxNewShares(uint requested);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the owner");
+        _;
+    }
 
     constructor(uint128 _shares, string memory _name, uint _salary, uint _idNumber) {
         shares = _shares;
         name = _name;
         salary = _salary;
         idNumber = _idNumber;
+        owner = msg.sender;
     }
 
     function viewSalary() public view returns (uint) {
@@ -25,9 +33,9 @@ contract EmployeeStorage {
         return shares;
     }
 
-    function grantShares(uint128 _newShares) public {
+    function grantShares(uint128 _newShares) public onlyOwner {
         if (_newShares > 5000) {
-            revert("Too many shares");
+            revert ExceedsMaxNewShares(_newShares);
         }
         
         if (shares + _newShares > 5000) {
@@ -37,13 +45,13 @@ contract EmployeeStorage {
         shares += _newShares;
     }
 
+    function debugResetShares() public onlyOwner {
+        shares = 1000;
+    }
+
     function checkForPacking(uint _slot) public view returns (uint r) {
         assembly {
             r := sload (_slot)
         }
-    }
-
-    function debugResetShares() public {
-        shares = 1000;
     }
 }

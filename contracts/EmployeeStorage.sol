@@ -1,52 +1,60 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "hardhat/console.sol";
-
-error TooManyShares(uint newShares);
-
 contract EmployeeStorage {
-    uint16 private shares;
-    uint248 private salary;
-    string public name;
-    uint public idNumber;
 
-    constructor(uint16 _shares, string memory _name, uint248 _salary, uint _idNumber) {
+    // Optimalisasi penyimpanan dengan mengurutkan dari tipe data yang lebih kecil
+    // Meskipun uint dan string tidak bisa di-pack, mengurutkannya
+    // dari yang terkecil tetap merupakan praktik terbaik.
+    uint128 private shares;
+    uint private salary;
+    uint public idNumber;
+    string public name;
+    address public owner;
+
+    error TooManyShares(uint newShares);
+    error ExceedsMaxNewShares(uint requested);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the owner");
+        _;
+    }
+
+    constructor(uint128 _shares, string memory _name, uint _salary, uint _idNumber) {
         shares = _shares;
         name = _name;
         salary = _salary;
         idNumber = _idNumber;
+        owner = msg.sender;
     }
 
-    function viewShares() public view returns (uint16) {
-        return shares;
-    }
-
-    function viewSalary() public view returns (uint248) {
+    function viewSalary() public view returns (uint) {
         return salary;
     }
 
-    function grantShares(uint _newShares) public {
+    function viewShares() public view returns (uint) {
+        return shares;
+    }
+
+    function grantShares(uint128 _newShares) public onlyOwner {
         if (_newShares > 5000) {
-            revert("Too many shares");
+            revert ExceedsMaxNewShares(_newShares);
         }
         
-        uint newTotalShares = uint(shares) + _newShares;
-
-        if (newTotalShares > 5000) {
-            revert TooManyShares(newTotalShares);
+        if (shares + _newShares > 5000) {
+            revert TooManyShares(shares + _newShares);
         }
 
-        shares = uint16(newTotalShares);
+        shares += _newShares;
+    }
+
+    function debugResetShares() public onlyOwner {
+        shares = 1000;
     }
 
     function checkForPacking(uint _slot) public view returns (uint r) {
         assembly {
             r := sload (_slot)
         }
-    }
-
-    function debugResetShares() public {
-        shares = 1000;
     }
 }

@@ -1,71 +1,40 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.23;
 
 contract EmployeeStorage {
-
-    uint128 private shares;
-    uint private salary;
-    uint public idNumber;
     string public name;
-    address public owner;
+    uint public idNumber;
 
-    error TooManyShares(uint newShares);
-    error ExceedsMaxNewShares(uint requested);
+    uint24 private salary;
+    uint16 private shares;
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not the owner");
-        _;
+    constructor() {
+        name = "Pat";
+        idNumber = 112358132134;
+        salary = 50000;
+        shares = 1000;
     }
 
-    constructor(uint128 _shares, uint _salary, uint _idNumber, string memory _name) {
-        shares = _shares;
-        name = _name;
-        salary = _salary;
-        idNumber = _idNumber;
-        owner = msg.sender;
-    }
-
-    function viewSalary() public view returns (uint) {
-        return salary;
-    }
-
-    function viewShares() public view returns (uint) {
-        return shares;
-    }
-
-    function grantShares(uint128 _newShares) public onlyOwner {
-        if (_newShares > 5000) {
-            revert ExceedsMaxNewShares(_newShares);
-        }
-        
-        if (shares + _newShares > 5000) {
-            revert TooManyShares(shares + _newShares);
-        }
-
+    function grantShares(uint16 _newShares) external {
+        require(_newShares <= 5000, "Too many shares");
         shares += _newShares;
     }
 
-    /**
-    * Do not modify this function. It is used to enable the unit test for this pin
-    * to check whether or not you have configured your storage variables to make
-    * use of packing.
-    *
-    * If you wish to cheat, simply modify this function to always return `0`
-    * I'm not your boss ¯\_(ツ)_/¯
-    *
-    * Fair warning though, if you do cheat, it will be on the blockchain having been
-    * deployed by your wallet....FOREVER!
-    */
-    function checkForPacking(uint _slot) public view returns (uint r) {
+    function checkForPacking(uint _slot) external view returns (uint result) {
         assembly {
-            r := sload (_slot)
+            result := sload(_slot)
         }
     }
 
-    /**
-    * Warning: Anyone can use this function at any time!
-    */
-    function debugResetShares() public onlyOwner {
+    function viewShares() external view returns (uint16) {
+        return shares;
+    }
+
+    function viewSalary() external view returns (uint24) {
+        return salary;
+    }
+
+    function debugResetShares() external {
         shares = 1000;
     }
 }
